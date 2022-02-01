@@ -164,7 +164,7 @@ public class TGPCamelLabels: TGPCamelLabels_INTERFACE_BUILDER {
 
     // Private
     var lastValue = NSNotFound
-    var emphasizedLabels:[UILabel] = []
+    var emojiImageViews:[UIImageView] = []
     var regularLabels:[UILabel] = []
     var localeCharacterDirection = CFLocaleLanguageDirection.leftToRight
 
@@ -216,11 +216,11 @@ public class TGPCamelLabels: TGPCamelLabels_INTERFACE_BUILDER {
 
     func layoutTrack() {
 
-        func insetLabel(_ label:UILabel?, withInset inset:NSInteger, andMultiplier multiplier:CGFloat) {
-            assert(label != nil)
-            if let label = label {
-                label.frame = {
-                    var frame = label.frame
+        func insetLabel(_ view:UIView?, withInset inset:NSInteger, andMultiplier multiplier:CGFloat) {
+            assert(view != nil)
+            if let view = view {
+                view.frame = {
+                    var frame = view.frame
                     frame.origin.x += frame.size.width * multiplier
                     frame.origin.x += CGFloat(inset)
                     return frame
@@ -228,10 +228,10 @@ public class TGPCamelLabels: TGPCamelLabels_INTERFACE_BUILDER {
             }
         }
 
-        for label in emphasizedLabels {
-            label.removeFromSuperview()
+        for imageView in emojiImageViews {
+            imageView.removeFromSuperview()
         }
-        emphasizedLabels = []
+        emojiImageViews = []
         for label in regularLabels {
             label.removeFromSuperview()
         }
@@ -248,29 +248,41 @@ public class TGPCamelLabels: TGPCamelLabels_INTERFACE_BUILDER {
                 : ticksDistance
             let centerY = bounds.height / 2.0
             for name in names {
-                let upLabel = UILabel.init()
-                upLabel.numberOfLines = numberOfLinesInLabel
-                emphasizedLabels.append(upLabel)
-                upLabel.text = name
-                if let upFontName = upFontName {
-                    upLabel.font = UIFont.init(name: upFontName, size: upFontSize)
-                } else {
-                    upLabel.font = UIFont.boldSystemFont(ofSize: upFontSize)
-                }
-                if let textColor = upFontColor ?? tintColor {
-                    upLabel.textColor = textColor
-                }
-                upLabel.sizeToFit()
-                upLabel.center = CGPoint(x: centerX, y: centerY)
-
-                upLabel.frame = {
-                    var frame = upLabel.frame
+                let emojiImageView: UIImageView = .init(image: .init(named: "\(name)-puan"))
+                emojiImageView.frame.size = .init(width: 25, height: 25)
+                emojiImageView.center = CGPoint(x: centerX, y: centerY)
+                emojiImageViews.append(emojiImageView)
+                emojiImageView.frame = {
+                    var frame = emojiImageView.frame
                     frame.origin.y = bounds.height - frame.height
                     return frame
                 }()
-
-                upLabel.alpha = 0.0
-                addSubview(upLabel)
+                emojiImageView.alpha = 0.0
+                addSubview(emojiImageView)
+                
+//                let upLabel = UILabel.init()
+//                upLabel.numberOfLines = numberOfLinesInLabel
+//                emphasizedLabels.append(upLabel)
+//                upLabel.text = name
+//                if let upFontName = upFontName {
+//                    upLabel.font = UIFont.init(name: upFontName, size: upFontSize)
+//                } else {
+//                    upLabel.font = UIFont.boldSystemFont(ofSize: upFontSize)
+//                }
+//                if let textColor = upFontColor ?? tintColor {
+//                    upLabel.textColor = textColor
+//                }
+//                upLabel.sizeToFit()
+//                upLabel.center = CGPoint(x: centerX, y: centerY)
+//
+//                upLabel.frame = {
+//                    var frame = upLabel.frame
+//                    frame.origin.y = bounds.height - frame.height
+//                    return frame
+//                }()
+//
+//                upLabel.alpha = 0.0
+//                addSubview(upLabel)
 
                 let dnLabel = UILabel.init()
                 dnLabel.numberOfLines = numberOfLinesInLabel
@@ -302,8 +314,8 @@ public class TGPCamelLabels: TGPCamelLabels_INTERFACE_BUILDER {
                 let localeOffCenter = (.rightToLeft == localeCharacterDirection)
                     ? -offCenter
                     : offCenter
-                insetLabel(emphasizedLabels.first, withInset: localeInsets, andMultiplier: localeOffCenter)
-                insetLabel(emphasizedLabels.last, withInset: -localeInsets, andMultiplier: -localeOffCenter)
+                insetLabel(emojiImageViews.first, withInset: localeInsets, andMultiplier: localeOffCenter)
+                insetLabel(emojiImageViews.last, withInset: -localeInsets, andMultiplier: -localeOffCenter)
                 insetLabel(regularLabels.first, withInset: localeInsets, andMultiplier: localeOffCenter)
                 insetLabel(regularLabels.last, withInset: -localeInsets, andMultiplier: -localeOffCenter)
             }
@@ -326,7 +338,7 @@ public class TGPCamelLabels: TGPCamelLabels_INTERFACE_BUILDER {
         // Each animation picks up where the previous left off
         let moveBlock:() -> Void = {
             // De-emphasize almost all
-            for (idx, label) in self.emphasizedLabels.enumerated() {
+            for (idx, label) in self.emojiImageViews.enumerated() {
                 if emphasized != idx {
                     self.verticalAlign(aView: label,
                                        alpha: 0,
@@ -342,8 +354,8 @@ public class TGPCamelLabels: TGPCamelLabels_INTERFACE_BUILDER {
             }
 
             // Emphasize the selection
-            if emphasized < self.emphasizedLabels.count {
-                self.verticalAlign(aView: self.emphasizedLabels[emphasized],
+            if emphasized < self.emojiImageViews.count {
+                self.verticalAlign(aView: self.emojiImageViews[emphasized],
                                    alpha:1,
                                    attribute: self.emphasisLayoutAttribute)
             }
